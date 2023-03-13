@@ -30,20 +30,16 @@ public class Tool extends ItemSword {
         if (!isCropBlock(world, x, y, z)) return false;
         int range = HarvestConfig.HARVEST_RANGE;
 
-        List<CropBuffer> cropsList = new ArrayList<CropBuffer>();
-        for (int i = -range; i < range; ++i) {
-            for (int k = -range; k < range; ++k) {
-                if (world.getBlock(x + i, y, z + k) instanceof BlockCrops) {
-                    cropsList.add(new CropBuffer((BlockCrops) world.getBlock(x + i, y, z + k), world, x + i, y, z + k));
-                }
-            }
-        }
+        List<CropData> cropsList = new ArrayList<CropData>();
+        for (int i = -range; i < range; ++i) for (int k = -range; k < range; ++k)
+            if (world.getBlock(x + i, y, z + k) instanceof BlockCrops)
+                cropsList.add(new CropData((BlockCrops) world.getBlock(x + i, y, z + k), world, x + i, y, z + k));
 
         return isHarvest(cropsList, player, item);
     }
 
-    private boolean isHarvest(List<CropBuffer> cropsList, EntityPlayer player, ItemStack item) {
-        for (CropBuffer crop : cropsList) {
+    private boolean isHarvest(List<CropData> cropsList, EntityPlayer player, ItemStack item) {
+        for (CropData crop : cropsList) {
             int meta = crop.crop.getPlantMetadata(crop.worldObj, crop.x, crop.y ,crop.z);
             if (meta >= 7) {
                 List<ItemStack> outputList = crop.crop.getDrops(crop.worldObj, crop.x, crop.y, crop.z, meta, 0);
@@ -60,7 +56,7 @@ public class Tool extends ItemSword {
                 if (!crop.worldObj.isRemote) {
                     crop.worldObj.setBlockMetadataWithNotify(crop.x, crop.y, crop.z, 0, 3);
                     for (ItemStack itemStack : outputList) {
-                        EntityItem entityItem = new EntityItem(crop.worldObj, crop.x + 0.5, crop.y + 0.5, crop.z + 0.5, itemStack);
+                        EntityItem entityItem = new EntityItem(crop.worldObj, crop.x, crop.y + 0.5, crop.z, itemStack);
                         entityItem.delayBeforeCanPickup = 10;
                         crop.worldObj.spawnEntityInWorld(entityItem);
                     }
@@ -68,10 +64,7 @@ public class Tool extends ItemSword {
                     outputList.clear();
                 }
 
-                if (Harvest.isInstallMMM) {
-                    MMMHelper.init(crop, player);
-                }
-
+                if (Harvest.isInstallMMM) MMMHelper.init(crop, player);
                 this.setDamage(item, this.getDamage(item) - 1);
             }
         }

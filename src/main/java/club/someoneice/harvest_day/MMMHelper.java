@@ -10,20 +10,14 @@ import project.studio.manametalmod.produce.farming.BlockCropSpecial;
 public class MMMHelper {
     public MMMHelper() { }
 
-    public static void init(CropBuffer crops, EntityPlayer player) {
+    public static void init(CropData crops, EntityPlayer player) {
+        ManaMetalModRoot root = MMM.getEntityNBT(player);
         if (crops.crop instanceof BlockCropSpecial) {
             BlockCropSpecial MMMcrop = (BlockCropSpecial) crops.crop;
-            ManaMetalModRoot root = MMM.getEntityNBT(player);
-            if (root != null) {
-                root.produce.addEXP(16 + MMMcrop.LV * 16, Produce.Farmer);
-            }
+            if (root != null) root.produce.addEXP(16 + MMMcrop.LV * 16, Produce.Farmer);
             MMM.spawnItemInWorld(crops.worldObj, ItemCoinSpecial.getTheCoinDropItems(ItemCoinSpecial.CoinTypes.Farm, 2 + MMMcrop.LV), crops.x, crops.y + 0.5D, crops.z);
-
         } else {
-            ManaMetalModRoot root = MMM.getEntityNBT(player);
-            if (root != null) {
-                root.produce.addEXP(16, Produce.Farmer);
-            }
+            if (root != null) root.produce.addEXP(16, Produce.Farmer);
             MMM.spawnItemInWorld(crops.worldObj, ItemCoinSpecial.getTheCoinDropItems(ItemCoinSpecial.CoinTypes.Farm, 2), crops.x, crops.y + 0.5D, crops.z);
         }
 
